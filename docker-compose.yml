@@ -6,7 +6,7 @@ services:
 #    ports:
 #      - "5000:5000"
     volumes:
-      - "./src:/src"
+      - "./src:/home/bot/src"
     tty: true
     environment:
       TZ: Asia/Tokyo

@@ -8,4 +8,4 @@ RUN apt-get update && apt-get install -y python3-pip && \
     groupadd -r bot && useradd --no-log-init -r -m -g bot bot
 USER bot
 WORKDIR /home/bot
-RUN pip3 install pymysql sqlalchemy
+RUN pip3 install --user pymysql sqlalchemy tweepy
