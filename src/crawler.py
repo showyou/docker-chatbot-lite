@@ -5,23 +5,25 @@ import sys
 import os
 
 # /home/*/hama_dbとかが返ってくる
-exec_path = os.path.abspath(os.path.dirname(__file__)).rsplit("/",1)[0]
+#exec_path = os.path.abspath(os.path.dirname(__file__)).rsplit("/",1)[0]
+exec_path = "."
 conf_path = exec_path+"/common/config.json"
 sys.path.insert(0,exec_path)
 from common import auth_api, model
 
-import simplejson
+import json
 import datetime
 from   sqlalchemy import and_
-
+import random
 
 #ログに入れない人のリスト
 g_ngUser = [ 
-	"ha_ma", "donsuke", "yuka_" 
+	"NakasukasumiB" 
 ]
 
 
 dbSession = None
+
 
 def get_auth_data(fileName):
 	file = open(fileName,'r')
@@ -50,13 +52,17 @@ def main():
     update_flag = True
     while update_flag:
         update_flag = False
-        l = tw.home_timeline(page = page_number, count=100)
+        #l = tw.home_timeline(page = page_number, count=100)
+        l = tw.search("かすかす", count=10)
         page_number += 1
         if page_number > 2: break
         for s in l:
+            if( s.text.startswith("RT ")): continue
+            print("rep: ", s.in_reply_to_status_id)
+            if( s.in_reply_to_status_id is not None and int(s.in_reply_to_status_id) != -1): continue
             #if s.author.screen_name == userdata["user"]:continue
             jTime = s.created_at + datetime.timedelta(hours = 9)
-            name = unicode(s.user.screen_name)
+            name = s.user.screen_name
             if( is_ng_user(name) ): continue
             query = dbSession.query(model.Tweet).filter(
                 and_(model.Tweet.user==name,
@@ -72,7 +78,11 @@ def main():
             t.tweetID = s.id
             #print "id:",s.id, 
             dbSession.add(t)
+
+            message = random.choice(["かすかすじゃなくってかすみんです！","かすみん！"])
+            tw.update_status("@"+name+" "+message, t.replyID)
         dbSession.commit()
+
 
 if __name__ == "__main__":
     main()
