@@ -59,14 +59,20 @@ def main():
         for s in l:
             if( s.text.startswith("RT ")): continue
             print("rep: ", s.in_reply_to_status_id)
-            if( s.in_reply_to_status_id is not None and int(s.in_reply_to_status_id) != -1): continue
+            if( s.in_reply_to_status_id is not None and\
+                int(s.in_reply_to_status_id) != -1 and\
+                not(s.text.startswith("@NakasukasumiB")))): continue
             #if s.author.screen_name == userdata["user"]:continue
+            
             jTime = s.created_at + datetime.timedelta(hours = 9)
             name = s.user.screen_name
             if( is_ng_user(name) ): continue
             query = dbSession.query(model.Tweet).filter(
-                and_(model.Tweet.user==name,
-                model.Tweet.tweetID == s.id))
+                and_(
+                    model.Tweet.user==name,
+                    model.Tweet.tweetID == s.id
+                )
+            )
             if( query.count() > 0 ): continue
             update_flag = True
 
@@ -79,7 +85,18 @@ def main():
             #print "id:",s.id, 
             dbSession.add(t)
 
-            message = random.choice(["かすかすじゃなくってかすみんです！","かすみん！"])
+            message =""
+            if(s.text.startswith("@NakasukasumiB")):
+                message = random.choice([
+                    "せんぱい、コッペパン焼いてきましたよ！", 
+                    "えへへっ！"
+                ])
+            else:
+                message = random.choice([
+                    "かすかすじゃなくってかすみんです！",
+                    "かすみん！",
+                    "だから、かすかすじゃなくってかすみんですってば！"
+                ])
             tw.update_status("@"+name+" "+message, t.replyID)
         dbSession.commit()
 
