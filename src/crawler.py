@@ -96,12 +96,14 @@ def main():
         page_number += 1
         if page_number > 2: break
 
-        l = tw.search("かすかす", count=10)
+        #l = tw.search("かすかす", count=10)
+        l = tw.home_timeline(page = page_number, count=10)
         for s in l:
             update_flag = check_text(s.text, s.in_reply_to_status_id,
                     s.user.screen_name, s.created_at,
                     s.id, dbSession, check_reply)
             if(not(update_flag)): continue
+            if(not("かすかす" in s.text)): continue
             message = random.choice([
                 "かすかすじゃなくってかすみんです！",
                 "かすみん！",
@@ -109,6 +111,7 @@ def main():
             ])
             try:
                 tw.update_status("@"+s.user.screen_name+" "+message, s.in_reply_to_status_id)
+                print("user"+s.user.screen_name)
             except tweepy.TweepError:
                 pass
         dbSession.commit()
