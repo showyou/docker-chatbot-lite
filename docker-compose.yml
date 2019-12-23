@@ -1,16 +1,15 @@
 version: '3'
 
 services:
-  bot:
-    build: .
+#  bot:
+#    build: .
 #    ports:
 #      - "5000:5000"
-    volumes:
-      - "./src:/home/bot/src"
-    tty: true
-    environment:
-      TZ: Asia/Tokyo
-#    command: flask run -h 0.0.0.0
+#    volumes:
+#      - "./src:/home/bot/src"
+#    tty: true
+#    environment:
+#      TZ: Asia/Tokyo
   db:
     build: ./mysql/
     volumes:
@@ -18,3 +17,16 @@ services:
       - ./mysql/sqls:/docker-entrypoint-initdb.d
     environment:
       - MYSQL_ROOT_PASSWORD=hoge
+  postgresql:
+    build: ./postgresql/
+    volumes:
+       - ./postgresql/data:/var/lib/postgresql/data
+  digdag:
+    build: ./digdag/
+    volumes:
+      - ./workflow/:/tmp/bot/workflow
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp:/tmp
+    ports:
+      - "65432:65432"
+      - "65433:65433"

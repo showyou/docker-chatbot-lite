@@ -132,3 +132,4 @@ dmypy.json
 config.json
 user.json
 mysql_data
+postgresql/data/*
